@@ -11,7 +11,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
         elmDefaults = {},
         character = {},
         checkRequest,
-        manifestUrl = 'https://zero.mekton.nl/manifest.webapp',
+        manifestUrl = 'https://zone.mekton.nl/manifest.webapp',
         updateSelection,
         updateSavedChar,
         generateStats,
@@ -27,7 +27,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
         addSkillToStat,
         setBatteryManagers,
         rnd,
-        weightedRnd,
+//        weightedRnd,
         placeName,
         addView,
         addInstallButton,
@@ -81,27 +81,27 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
 
-    weightedRnd = function (list, weights) { // examples list = ["skill1", "skill2"], weights = [1,4]
-        var rand,
-            totalWeight,
-            nr,
-            i,
-            l,
-            sum = 0;
-        rand = function (max) {
-            return (Math.random() * max).toFixed(2);
-        };
-        totalWeight = weights.reduce(function (prev, cur) {
-            return prev + cur;
-        });
-        nr = rand(totalWeight);
-        for (i = 0, l = weights.length; i <= l; i += 1) {
-            sum += weights[i];
-            if (nr <= sum) {
-                return list[i];
-            }
-        }
-    };
+//    weightedRnd = function (list, weights) { // examples list = ["skill1", "skill2"], weights = [1,4]
+//        var rand,
+//            totalWeight,
+//            nr,
+//            i,
+//            l,
+//            sum = 0;
+//        rand = function (max) {
+//            return (Math.random() * max).toFixed(2);
+//        };
+//        totalWeight = weights.reduce(function (prev, cur) {
+//            return prev + cur;
+//        });
+//        nr = rand(totalWeight);
+//        for (i = 0, l = weights.length; i <= l; i += 1) {
+//            sum += weights[i];
+//            if (nr <= sum) {
+//                return list[i];
+//            }
+//        }
+//    };
 
     placeName = function (text) {
         if (elements.name.value) {
@@ -122,12 +122,26 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
     // **************************************************************************************************
     generateLifepath = function (start, elmTable, type) {
         var doc,
-            follow;
+            follow,
+            addPer;
+        addPer = function (from) {
+            return function (item) {
+                character[type][from].text += ', ' + item[rnd(item.length)];
+            };
+        };
         follow = function (from) {
+            var i;
             if (!Array.isArray(doc[from])) {
                 return;
             }
             character[type][from] = doc[from][rnd(doc[from].length)];
+            if (character[type][from].times && character[type][from].per) {
+                character[type][from].text += '<br/>';
+                for (i = 0; i < character[type][from].times; i += 1) {
+                    character[type][from].per.forEach(addPer(from));
+                    character[type][from].text += '<br/>';
+                }
+            }
             if (character[type][from].next) {
                 follow(character[type][from].next);
             }
@@ -350,10 +364,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
     display = function () {
         var edges,
             stats,
-            statRow,
-            statValueRow,
-            elmStatsInner = '',
-            count = 0;
+            elmStatsInner = '';
         // Edges
         edges = Object.keys(character.edge);
         elements.edge.innerHTML = '';
@@ -438,7 +449,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
             generateStats(doc);
             generateSkills(doc);
             generateLifepath('Hair Color', document.getElementById('traits'), 'Traits');
-            generateLifepath('Romantic life', document.getElementById('lifepath'));
+            generateLifepath('Money', document.getElementById('lifepath'), 'Lifepath');
             generateGear(doc);
             display();
         });
@@ -637,7 +648,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
     });
     // Update local mekton database, and listen to replicate events
     startReplicator = function () {
-        replicator = Pouchdb.replicate('https://zero.mekton.nl/db/mekton', 'mekton', {live: true, filter: 'mekton/typedDocs'})
+        replicator = Pouchdb.replicate('https://zone.mekton.nl/db/zone', 'mekton', {live: true, filter: 'mekton/typedDocs'})
             .on('uptodate', function () {
                 updateSelection();
             })
