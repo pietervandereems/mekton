@@ -11,7 +11,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
         elmDefaults = {},
         character = {},
         checkRequest,
-        manifestUrl = 'https://zone.mekton.nl/manifest.webapp',
+        manifestUrl = 'https://zero.mekton.nl/manifest.webapp',
         updateSelection,
         updateSavedChar,
         generateStats,
@@ -637,7 +637,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
     });
     // Update local mekton database, and listen to replicate events
     startReplicator = function () {
-        replicator = Pouchdb.replicate('https://zone.mekton.nl/db/zone', 'mekton', {live: true, filter: 'mekton/typedDocs'})
+        replicator = Pouchdb.replicate('https://zero.mekton.nl/db/mekton', 'mekton', {live: true, filter: 'mekton/typedDocs'})
             .on('uptodate', function () {
                 updateSelection();
             })
