@@ -514,7 +514,7 @@ requirejs(['pouchdb-3.2.0.min'], function (Pouchdb) {
             displaySkills();
             displayGear();
             displayLifepath(document.getElementById('traits'), 'Traits');
-            displayLifepath(document.getElementById('lifepath'), 'Romantic life');
+            displayLifepath(document.getElementById('lifepath'), 'Lifepath');
         });
     });
 
